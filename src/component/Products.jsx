@@ -1,43 +1,33 @@
-import axios from "axios"
 import { useEffect } from "react"
-import { useState } from "react"
 import { Col, Row } from "react-bootstrap"
 import ProductCard from "../shared/ProductCard"
+import { useDispatch, useSelector } from "react-redux"
+import { Add } from "../features/CartSlice"
+import { getProducts } from "../features/ProductSlice"
 
 
 function Products() {
-    const [products, setProducts] = useState([])
-    const [error, setError] = useState({
-        error : false,
-        message : ""
-    })
-    const [loading, setLoading] = useState(true)
+
+    const dispatch = useDispatch()
+    const {data, status} = useSelector(state => state.products)
 
     useEffect(() => {
-        const result = axios.get('https://fakestoreapi.com/products')
-        .then(response => response.data) // Extract the data
-        .catch(error => {
-            setError({
-                error : true,
-                message : error.message
-            })
-            setLoading(false)
-        });
-        
-        result.then(data => {
-            setProducts(data)
-            setLoading(false)
-        });
+        dispatch(getProducts())
     }, [])
 
+    const addToCart = (item) => {   
+        dispatch(Add(item))
+    }
+    console.log(status);
+    
     return (
         <Row>
             {
-                loading
+                status === 'loading ' || status === 'idle'
                 ? <h1>Loading ...</h1>
-                : error.error
-                ? <h3>{error.message}</h3>
-                : products.map (item => <Col key={item.id} sm={6} lg={4}><ProductCard item={item}></ProductCard></Col>)
+                : status === 'failed'
+                ? <h3>Failed To Load Data</h3>
+                : data.map (item => <Col key={item.id} sm={6} lg={4}><ProductCard item={item} cartAction={addToCart} actionName={"Add"}></ProductCard></Col>)
             }
         </Row>    
     )

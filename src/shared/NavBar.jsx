@@ -6,7 +6,7 @@ import { NavLink } from 'react-router-dom';
 
 function NavBar() {
     const cartCount = useSelector(state => state.cart.count);
-    
+
     return (
         <Navbar expand="lg" className="bg-body-tertiary">
             <Container>
